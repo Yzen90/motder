@@ -1,0 +1,46 @@
+[package]
+name = "motder"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.89"
+description = "Add, list and dismiss your own messages in Ubuntu's dynamic message of the day (update-motd)"
+readme = "README.md"
+license = "Apache-2.0"
+keywords = ["motd", "ubuntu", "update-motd", "login", "sysadmin"]
+categories = ["command-line-utilities"]
+repository = "https://github.com/Yzen90/motder"
+homepage = "https://github.com/Yzen90/motder"
+authors = ["Edgar Montiel Cruz <edgar@yzen.pro>"] 
+include = [
+    "/src/**",
+    "/tests/**",
+    "/completions/**",
+    "/man/**",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/LICENSE",
+]
+
+[dependencies]
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+# `cargo deb` (https://crates.io/crates/cargo-deb) packaging for Ubuntu.
+[package.metadata.deb]
+section = "admin"
+priority = "optional"
+depends = "$auto"
+extended-description = """\
+motder manages a small set of administrator messages that are shown in the \
+dynamic message of the day on login. It installs a single hook in \
+/etc/update-motd.d and keeps its messages in /var/lib/motder."""
+assets = [
+    ["target/release/motder", "usr/bin/", "755"],
+    ["README.md", "usr/share/doc/motder/", "644"],
+    ["man/motder.1", "usr/share/man/man1/", "644"],
+    ["completions/motder.bash", "usr/share/bash-completion/completions/motder", "644"],
+]

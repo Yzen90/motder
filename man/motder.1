@@ -1,0 +1,114 @@
+.TH MOTDER 1 "2026-10-04" "motder 0.1.0" "User Commands"
+.SH NAME
+motder \- add, list and dismiss messages in Ubuntu's message of the day
+.SH SYNOPSIS
+.B motder
+.RI [ OPTIONS ]
+.RI [ COMMAND ]
+.RI [ ARGS ]
+.SH DESCRIPTION
+.B motder
+manages a list of administrator messages that are shown in the dynamic
+message of the day at login. It installs a single hook,
+.IR /etc/update-motd.d/99-motder ,
+which
+.BR pam_motd (8)
+runs at login along with Ubuntu's other update-motd scripts.
+.PP
+Messages are numbered from 1 (oldest) in the order they were added.
+Numbers are positions in the current list and shift after a dismissal.
+.PP
+Changing messages requires root. Listing works for any user.
+.SH COMMANDS
+.TP
+.BI "add " MESSAGE ...
+Add a message. Words are joined with single spaces. If no
+.I MESSAGE
+is given, or it is
+.BR \- ,
+the message is read from standard input and may span several lines.
+.TP
+.BR list ", " ls " [" \-\-json ]
+List messages with their index and age. This is the default command.
+.B \-\-json
+prints a JSON array with
+.IR index ,
+.IR id ,
+.I created
+(RFC 3339, UTC) and
+.IR text .
+.TP
+.BR dismiss ", " rm " [\fIINDEX\fR]..."
+Dismiss the messages with the given indices. With no index, dismiss the
+last (most recently added) message. If any index is invalid, nothing is
+dismissed.
+.TP
+.B clear
+Dismiss all messages.
+.TP
+.B show
+Print the text motder contributes to the login screen.
+.TP
+.B install
+Install or repair the hook. Every change does this automatically.
+.TP
+.BR uninstall " [" \-\-purge ]
+Remove the hook. Messages are kept unless
+.B \-\-purge
+is given.
+.TP
+.B help
+Show usage information.
+.SH OPTIONS
+.TP
+.BI \-\-state\-dir " DIR"
+Directory holding the messages. Default:
+.IR /var/lib/motder .
+.TP
+.BI \-\-motd\-dir " DIR"
+The update-motd script directory. Default:
+.IR /etc/update-motd.d .
+.TP
+.BR \-h ", " \-\-help
+Show usage information.
+.TP
+.BR \-V ", " \-\-version
+Show the version.
+.TP
+.B \-\-
+Treat all following arguments as message text, for messages that begin
+with a dash.
+.SH ENVIRONMENT
+.TP
+.B MOTDER_STATE_DIR
+Default for
+.BR \-\-state\-dir .
+.TP
+.B MOTDER_MOTD_DIR
+Default for
+.BR \-\-motd\-dir .
+.SH FILES
+.TP
+.I /var/lib/motder/messages
+The stored messages.
+.TP
+.I /var/lib/motder/motd
+The rendered text printed at login.
+.TP
+.I /etc/update-motd.d/99-motder
+The hook script.
+.SH EXIT STATUS
+0 on success, 1 on failure, 2 on invalid usage.
+.SH EXAMPLES
+.nf
+sudo motder add 'Maintenance window: Saturday 02:00\-04:00 UTC'
+df \-h /data | sudo motder add
+motder list
+sudo motder dismiss
+sudo motder dismiss 1 3
+sudo run\-parts /etc/update\-motd.d    # preview the full motd
+.fi
+.SH SEE ALSO
+.BR update\-motd (5),
+.BR pam_motd (8),
+.BR run\-parts (8)
